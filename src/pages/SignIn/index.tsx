@@ -17,6 +17,7 @@ import {
   CreateAccountButtonText 
 } from './styles';
 import getValidationErrors from '../../../utils/getValidationErros';
+import { useAuth } from '../../hooks/auth';
 
 interface SignInFormData {
   email: string;
@@ -28,7 +29,8 @@ const SignIn: React.FC = () => {
   const navigation = useNavigation();
   const passwordInputRef = useRef<TextInput>(null);
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  const { signIn } = useAuth();
+
   const handleSignIn = useCallback(
     async (data: SignInFormData) => {
       try {
@@ -41,8 +43,8 @@ const SignIn: React.FC = () => {
           password: Yup.string().required('Senha obrigatória'),
         });
         await schema.validate(data, { abortEarly: false });
-        // await signIn({ email: data.email, password: data.password });
-        // history.push('/dashboard');
+        await signIn({ email: data.email, password: data.password });
+
         Alert.alert(
           'Sucesso',
           'Autenticação realizada com sucesso!',
@@ -59,7 +61,7 @@ const SignIn: React.FC = () => {
         );
       }
     },
-    [],
+    [signIn],
   );
 
   return (

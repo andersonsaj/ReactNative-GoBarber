@@ -15,6 +15,7 @@ import {
   BackToSignInText 
 } from './styles';
 import getValidationErrors from '../../../utils/getValidationErros';
+import api from '../../services/api';
 
 interface SignUpFormData {
   name: string;
@@ -40,14 +41,14 @@ const SignUp: React.FC = () => {
         password: Yup.string().min(6, 'No mínimo 6 dígitos'),
       });
       await schema.validate(data, { abortEarly: false });
-      // const response = await api.post('/users', data);
+      await api.post('/users', data);
 
-      // history.push('/');
+
       Alert.alert(
-        'Cadastro realizado!',
+        'Cadastro realizado com sucesso!',
         'Você já pode fazer seu logon no GoBarber!',
       );
-      
+      navigation.goBack();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
@@ -60,7 +61,7 @@ const SignUp: React.FC = () => {
       );
     }
   },
-  [],
+  [navigation],
 );
 
   return (
