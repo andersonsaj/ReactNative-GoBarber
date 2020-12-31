@@ -1,6 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';

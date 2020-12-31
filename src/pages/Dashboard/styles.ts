@@ -1,7 +1,6 @@
-import styled from 'styled-components/native';
-import { getStatusBarHeight } from 'react-native-iphone-x-helper';
 import { FlatList } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
+import styled from 'styled-components/native';
 import { Provider } from '.';
 
 export const Contanier = styled.View`
