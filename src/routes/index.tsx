@@ -6,21 +6,23 @@ import AppRoutes from './app.routes';
 import AuthRoutes from './auth.routes';
 
 const Routes: React.FC = () => {
-    const { user, loading } = useAuth();
+  const { user, loading } = useAuth();
 
-    if(loading) {
-     return (
-       <View style={{
-            alignItems: 'center',
-           justifyContent: 'center',
-           flex:1}}
-       >
-         <ActivityIndicator size="large" color="#999" />
-       </View>
-        )
-    }
+  if (loading) {
+    return (
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+        }}
+      >
+        <ActivityIndicator size="large" color="#999" />
+      </View>
+    );
+  }
 
-    return user ? <AppRoutes /> : <AuthRoutes />;
-}
+  return user ? <AppRoutes /> : <AuthRoutes />;
+};
 
 export default Routes;
