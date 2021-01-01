@@ -38,7 +38,7 @@ const Dashboard: React.FC = () => {
         setProviders(response.data);
       })
       .catch(err => console.log(err));
-  }, []);
+  }, [user, providers]);
 
   const navigateToProfile = useCallback(() => {
     navigate('Profile');
