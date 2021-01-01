@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useCallback, useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/Feather';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
 import {
@@ -14,6 +15,8 @@ import {
   ProviderAvatar,
   ProviderContainer,
   ProviderName,
+  Calendar,
+  Title,
 } from './styles';
 
 interface RouteParams {
@@ -83,6 +86,15 @@ const CreateAppointment: React.FC = () => {
           )}
         />
       </ProvidersListContainer>
+      <Calendar>
+        <Title>Escolha a sua Data</Title>
+        <DateTimePicker
+          mode="date"
+          display="calendar"
+          textColor="#f4ede8"
+          value={new Date()}
+        />
+      </Calendar>
     </Container>
   );
 };
