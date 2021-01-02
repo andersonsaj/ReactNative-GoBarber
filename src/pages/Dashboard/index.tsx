@@ -73,6 +73,7 @@ const Dashboard: React.FC = () => {
         }
         renderItem={({ item: provider }) => (
           <ProviderContainer
+            key={provider.id}
             onPress={() => navigateToCreateAppoitment(provider.id)}
           >
             <ProviderAvatar source={{ uri: provider.avatar_url }} />
