@@ -25,23 +25,25 @@ import getValidationErrors from '../../../utils/getValidationErros';
 import api from '../../services/api';
 import { useAuth } from '../../hooks/auth';
 
-interface SignUpFormData {
+interface ProfileFormData {
   name: string;
   email: string;
+  old_password: string;
   password: string;
+  password_confirmation: string;
 }
 
-const SignUp: React.FC = () => {
-  const { user } = useAuth();
+const Profile: React.FC = () => {
+  const { user, updatedUser } = useAuth();
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
   const emailInputRef = useRef<TextInput>(null);
-  const passwordOldInputRef = useRef<TextInput>(null);
+  const oldPasswordInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const passwordConfirmationInputRef = useRef<TextInput>(null);
 
   const handleSignUp = useCallback(
-    async (data: SignUpFormData) => {
+    async (data: ProfileFormData) => {
       try {
         formRef.current?.setErrors({});
 
@@ -50,15 +52,49 @@ const SignUp: React.FC = () => {
           email: Yup.string()
             .required('E-mail obrigatório')
             .email('Digite um e-mail válido'),
-          password: Yup.string().min(6, 'No mínimo 6 dígitos'),
+          old_password: Yup.string(),
+          password: Yup.string().when('old_password', {
+            is: val => !!val.length,
+            then: Yup.string().required('Campo obrigatório'),
+            otherwise: Yup.string(),
+          }),
+          password_confirmation: Yup.string()
+            .when('old_password', {
+              is: val => !!val.length,
+              then: Yup.string().required('Campo obrigatório'),
+              otherwise: Yup.string(),
+            })
+            .oneOf([Yup.ref('password'), null], 'Confirmação incorreta'),
         });
-        await schema.validate(data, { abortEarly: false });
-        await api.post('/users', data);
 
-        Alert.alert(
-          'Cadastro realizado com sucesso!',
-          'Você já pode fazer seu logon no GoBarber!',
-        );
+        await schema.validate(data, { abortEarly: false });
+
+        const {
+          name,
+          email,
+          old_password,
+          password,
+          password_confirmation,
+        } = data;
+
+        const formData = {
+          name,
+          email,
+          ...(old_password
+            ? {
+                old_password,
+                password,
+                password_confirmation,
+              }
+            : {}),
+        };
+
+        const response = await api.post('/profile', formData);
+
+        updatedUser(response.data);
+
+        Alert.alert('Perfil atualizado com sucesso!');
+
         navigation.goBack();
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
@@ -66,8 +102,8 @@ const SignUp: React.FC = () => {
           formRef.current?.setErrors(errors);
         }
         Alert.alert(
-          'Erro ao fazer o cadastro',
-          'Ocorreu um erro ao fazer o cadastro, tente novamente',
+          'Erro na atualização do perfil',
+          'Ocorreu um erro ao atualização seu perfil, tente novamente',
         );
       }
     },
@@ -99,7 +135,7 @@ const SignUp: React.FC = () => {
             <View>
               <Title>Meu perfil</Title>
             </View>
-            <Form ref={formRef} onSubmit={handleSignUp}>
+            <Form initialData={user} ref={formRef} onSubmit={handleSignUp}>
               <Input
                 autoCapitalize="words"
                 name="name"
@@ -120,12 +156,12 @@ const SignUp: React.FC = () => {
                 placeholder="E-mail"
                 returnKeyType="next"
                 onSubmitEditing={() => {
-                  passwordOldInputRef.current?.focus();
+                  oldPasswordInputRef.current?.focus();
                 }}
               />
               <Input
-                ref={passwordOldInputRef}
-                name="password_old"
+                ref={oldPasswordInputRef}
+                name="old_password"
                 icon="lock"
                 placeholder="Senha atual"
                 secureTextEntry
@@ -175,4 +211,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+export default Profile;
