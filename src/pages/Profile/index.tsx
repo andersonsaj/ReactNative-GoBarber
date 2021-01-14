@@ -1,19 +1,20 @@
-import React, { useCallback, useRef } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { Form } from '@unform/mobile';
+import React, {useCallback, useRef} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {Form} from '@unform/mobile';
 import {
   KeyboardAvoidingView,
   Platform,
   View,
   ScrollView,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   TextInput,
   Alert,
 } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
+// import { launchImageLibrary } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Yup from 'yup';
-import { FormHandles } from '@unform/core';
-import Button from '../../components/Button';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import {FormHandles} from '@unform/core';
 import Input from '../../components/Input';
 import {
   Container,
@@ -24,7 +25,8 @@ import {
 } from './styles';
 import getValidationErrors from '../../../utils/getValidationErros';
 import api from '../../services/api';
-import { useAuth } from '../../hooks/auth';
+import {useAuth} from '../../hooks/auth';
+import Button from '../../components/Button';
 
 interface ProfileFormData {
   name: string;
@@ -35,7 +37,7 @@ interface ProfileFormData {
 }
 
 const Profile: React.FC = () => {
-  const { user, updatedUser } = useAuth();
+  const {user, updatedUser, signOut} = useAuth();
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
   const emailInputRef = useRef<TextInput>(null);
@@ -55,55 +57,20 @@ const Profile: React.FC = () => {
             .email('Digite um e-mail válido'),
           old_password: Yup.string(),
           password: Yup.string().when('old_password', {
-            is: val => !!val.length,
+            is: (val) => !!val.length,
             then: Yup.string().required('Campo obrigatório'),
             otherwise: Yup.string(),
           }),
           password_confirmation: Yup.string()
             .when('old_password', {
-              is: val => !!val.length,
+              is: (val) => !!val.length,
               then: Yup.string().required('Campo obrigatório'),
               otherwise: Yup.string(),
             })
             .oneOf([Yup.ref('password'), null], 'Confirmação incorreta'),
         });
 
-        const handleUpdateAvatar = useCallback(() => {
-          ImagePicker.showImagePicker(
-            {
-              title: 'Selecione um avatar',
-              cancelButtonTitle: 'Cancelar',
-              takePhotoButtonTitle: 'Usar câmera',
-              chooseFromLibraryButtonTitle: 'Escolha da galeria',
-            },
-            response => {
-              if (response.didCancel) {
-                return;
-              }
-
-              if (response.error) {
-                Alert.alert('Erro ao atualizar seu avatar.');
-                return;
-              }
-
-              const source = { uri: response.uri };
-
-              const data = new FormData();
-
-              data.append('avatar', {
-                type: 'image/jpeg',
-                name: `${user.id}.jpg`,
-                uri: response.uri,
-              });
-
-              api.patch('users/avatar', data).then(res => {
-                updatedUser(res.data);
-              });
-            },
-          );
-        }, [updatedUser, user.id]);
-
-        await schema.validate(data, { abortEarly: false });
+        await schema.validate(data, {abortEarly: false});
 
         const {
           name,
@@ -143,8 +110,36 @@ const Profile: React.FC = () => {
         );
       }
     },
-    [navigation],
+    [navigation, updatedUser],
   );
+
+  // const handleUpdatedAvatar = useCallback(() => {
+  //   launchImageLibrary(
+  //     {
+  //       mediaType: 'photo',
+  //       quality: 1,
+  //     },
+  //     response => {
+  //       if (response.didCancel) {
+  //         return;
+  //       }
+  //       if (response.errorMessage) {
+  //         Alert.alert('Erro ao atualizar seu avatar.');
+  //         return;
+  //       }
+  //       const source = { uri: response.uri };
+  //       const data = new FormData();
+  //       data.append('avatar', {
+  //         type: 'image/jpeg',
+  //         name: `${user.id}.jpg`,
+  //         uri: response.uri,
+  //       });
+  //       api.patch('users/avatar', data).then(res => {
+  //         updatedUser(res.data);
+  //       });
+  //     },
+  //   );
+  // }, [updatedUser, user.id]);
 
   const handleGoBack = useCallback(() => {
     navigation.goBack();
@@ -153,22 +148,21 @@ const Profile: React.FC = () => {
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        enabled
-      >
+        enabled>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ flex: 1 }}
-        >
+          contentContainerStyle={{flex: 1}}>
           <Container>
             <BackButton onPress={handleGoBack}>
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
-            <UserAvatarButton onPress={handleUpdateAvatar}>
-              <UserAvatar source={{ uri: user.avatar_url }} />
+            <UserAvatarButton onPress={() => {}}>
+              <UserAvatar source={{uri: user.avatar_url}} />
             </UserAvatarButton>
             <View>
+              <Button onPress={signOut}>Sair</Button>
               <Title>Meu perfil</Title>
             </View>
             <Form initialData={user} ref={formRef} onSubmit={handleSignUp}>
@@ -202,7 +196,7 @@ const Profile: React.FC = () => {
                 placeholder="Senha atual"
                 secureTextEntry
                 returnKeyType="next"
-                containerStyle={{ marginTop: 16 }}
+                containerStyle={{marginTop: 16}}
                 textContentType="newPassword"
                 onSubmitEditing={() => {
                   passwordInputRef.current?.focus();
@@ -234,9 +228,8 @@ const Profile: React.FC = () => {
               />
 
               <Button
-                style={{ marginBottom: 80 }}
-                onPress={() => formRef.current?.submitForm()}
-              >
+                style={{marginBottom: 80}}
+                onPress={() => formRef.current?.submitForm()}>
                 Confirmar mudanças
               </Button>
             </Form>
