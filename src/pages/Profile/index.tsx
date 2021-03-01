@@ -9,7 +9,6 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Yup from 'yup';
 import { FormHandles } from '@unform/core';
@@ -67,41 +66,6 @@ const Profile: React.FC = () => {
             })
             .oneOf([Yup.ref('password'), null], 'Confirmação incorreta'),
         });
-
-        const handleUpdateAvatar = useCallback(() => {
-          ImagePicker.showImagePicker(
-            {
-              title: 'Selecione um avatar',
-              cancelButtonTitle: 'Cancelar',
-              takePhotoButtonTitle: 'Usar câmera',
-              chooseFromLibraryButtonTitle: 'Escolha da galeria',
-            },
-            response => {
-              if (response.didCancel) {
-                return;
-              }
-
-              if (response.error) {
-                Alert.alert('Erro ao atualizar seu avatar.');
-                return;
-              }
-
-              const source = { uri: response.uri };
-
-              const data = new FormData();
-
-              data.append('avatar', {
-                type: 'image/jpeg',
-                name: `${user.id}.jpg`,
-                uri: response.uri,
-              });
-
-              api.patch('users/avatar', data).then(res => {
-                updatedUser(res.data);
-              });
-            },
-          );
-        }, [updatedUser, user.id]);
 
         await schema.validate(data, { abortEarly: false });
 
@@ -165,7 +129,7 @@ const Profile: React.FC = () => {
             <BackButton onPress={handleGoBack}>
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
-            <UserAvatarButton onPress={handleUpdateAvatar}>
+            <UserAvatarButton onPress={() => {}}>
               <UserAvatar source={{ uri: user.avatar_url }} />
             </UserAvatarButton>
             <View>
