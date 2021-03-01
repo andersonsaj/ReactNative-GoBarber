@@ -1,7 +1,7 @@
-import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/Feather';
-import {useAuth} from '../../hooks/auth';
+import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
 import {
   Contanier,
@@ -27,17 +27,17 @@ export interface Provider {
 }
 
 const Dashboard: React.FC = () => {
-  const {user} = useAuth();
-  const {navigate} = useNavigation();
+  const { signOut, user } = useAuth();
+  const { navigate } = useNavigation();
   const [providers, setProviders] = useState<Provider[]>([]);
 
   useEffect(() => {
     api
       .get('providers')
-      .then((response) => {
+      .then(response => {
         setProviders(response.data);
       })
-      .catch((err) => console.log(err));
+      .catch(err => console.log(err));
   }, []);
 
   const navigateToProfile = useCallback(() => {
@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
 
   const navigateToCreateAppoitment = useCallback(
     (providerId: string) => {
-      navigate('CreateAppointment', {providerId});
+      navigate('CreateAppointment', { providerId });
     },
     [navigate],
   );
@@ -61,21 +61,22 @@ const Dashboard: React.FC = () => {
         </HeaderTitle>
 
         <ProfileButton onPress={navigateToProfile}>
-          <UserAvatar source={{uri: user.avatar_url}} />
+          <UserAvatar source={{ uri: user.avatar_url }} />
         </ProfileButton>
       </Header>
 
       <ProvidersList
         data={providers}
-        keyExtractor={(provider) => provider.id}
+        keyExtractor={provider => provider.id}
         ListHeaderComponent={
           <ProviderListTitle>Cabeleireiros</ProviderListTitle>
         }
-        renderItem={({item: provider}) => (
+        renderItem={({ item: provider }) => (
           <ProviderContainer
             key={provider.id}
-            onPress={() => navigateToCreateAppoitment(provider.id)}>
-            <ProviderAvatar source={{uri: provider.avatar_url}} />
+            onPress={() => navigateToCreateAppoitment(provider.id)}
+          >
+            <ProviderAvatar source={{ uri: provider.avatar_url }} />
             <ProviderInfo>
               <ProviderName>{provider.name}</ProviderName>
               <ProviderMeta>
