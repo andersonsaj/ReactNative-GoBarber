@@ -8,8 +8,9 @@ export const Contanier = styled.View`
 `;
 
 export const Header = styled.View`
-  padding: 24px;
+  padding: 18px;
   background: #28262e;
+  margin-top: 20px;
 
   flex-direction: row;
   justify-content: space-between;

@@ -1,6 +1,6 @@
-import React, { useCallback, useRef } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { Form } from '@unform/mobile';
+import React, {useCallback, useRef} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {Form} from '@unform/mobile';
 import {
   Image,
   KeyboardAvoidingView,
@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Yup from 'yup';
-import { FormHandles } from '@unform/core';
+import {FormHandles} from '@unform/core';
 import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import { Container, Title, BackToSignIn, BackToSignInText } from './styles';
+import {Container, Title, BackToSignIn, BackToSignInText} from './styles';
 import getValidationErrors from '../../../utils/getValidationErros';
 import api from '../../services/api';
 
@@ -44,7 +44,7 @@ const SignUp: React.FC = () => {
             .email('Digite um e-mail válido'),
           password: Yup.string().min(6, 'No mínimo 6 dígitos'),
         });
-        await schema.validate(data, { abortEarly: false });
+        await schema.validate(data, {abortEarly: false});
         await api.post('/users', data);
 
         Alert.alert(
@@ -69,13 +69,13 @@ const SignUp: React.FC = () => {
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         enabled
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ flex: 1 }}
+          contentContainerStyle={{flex: 1}}
         >
           <Container>
             <Image source={logoImg} />
@@ -120,7 +120,7 @@ const SignUp: React.FC = () => {
               />
 
               <Button
-                style={{ marginBottom: 80 }}
+                style={{marginBottom: 80}}
                 onPress={() => formRef.current?.submitForm()}
               >
                 Entrar

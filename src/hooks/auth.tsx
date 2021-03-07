@@ -64,7 +64,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     const { user, token } = response.data;
 
     await AsyncStorage.multiSet([
-      ['@GoBarber:token', JSON.stringify(token)],
+      ['@GoBarber:token', token],
       ['@GoBarber:user', JSON.stringify(user)],
     ]);
     api.defaults.headers.authorization = `Bearer ${token}`;

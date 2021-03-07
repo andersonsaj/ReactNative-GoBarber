@@ -1,6 +1,5 @@
-import React, { useCallback, useRef } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { Form } from '@unform/mobile';
+import React, {useCallback, useRef} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,7 +10,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Yup from 'yup';
-import { FormHandles } from '@unform/core';
+import {FormHandles} from '@unform/core';
+import {Form} from '@unform/mobile';
+import {launchImageLibrary} from 'react-native-image-picker';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import {
@@ -23,7 +24,7 @@ import {
 } from './styles';
 import getValidationErrors from '../../../utils/getValidationErros';
 import api from '../../services/api';
-import { useAuth } from '../../hooks/auth';
+import {useAuth} from '../../hooks/auth';
 
 interface ProfileFormData {
   name: string;
@@ -34,7 +35,7 @@ interface ProfileFormData {
 }
 
 const Profile: React.FC = () => {
-  const { user, updatedUser } = useAuth();
+  const {user, updatedUser} = useAuth();
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
   const emailInputRef = useRef<TextInput>(null);
@@ -54,20 +55,20 @@ const Profile: React.FC = () => {
             .email('Digite um e-mail válido'),
           old_password: Yup.string(),
           password: Yup.string().when('old_password', {
-            is: val => !!val.length,
+            is: (val) => !!val.length,
             then: Yup.string().required('Campo obrigatório'),
             otherwise: Yup.string(),
           }),
           password_confirmation: Yup.string()
             .when('old_password', {
-              is: val => !!val.length,
+              is: (val) => !!val.length,
               then: Yup.string().required('Campo obrigatório'),
               otherwise: Yup.string(),
             })
             .oneOf([Yup.ref('password'), null], 'Confirmação incorreta'),
         });
 
-        await schema.validate(data, { abortEarly: false });
+        await schema.validate(data, {abortEarly: false});
 
         const {
           name,
@@ -107,30 +108,62 @@ const Profile: React.FC = () => {
         );
       }
     },
-    [navigation],
+    [navigation, updatedUser],
   );
 
   const handleGoBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
 
+  const handleUpdateAvatar = useCallback(() => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+        maxHeight: 500,
+        maxWidth: 500,
+      },
+        (response) => {
+          if(response.didCancel) {
+            return;
+          }
+          if(response.errorMessage) {
+            Alert.alert('Erro ao atualizar seu avatar.')
+            return;
+          }
+
+          const source = {uri: response.uri};
+
+          const data = new FormData();
+
+          data.append('avatar', {
+            type: 'image/jpg',
+            name: `${user.id}.jpg`,
+            uri: response.uri,
+          });
+          api.patch('users/avatar', data).then(res => {
+            updatedUser(res.data);
+          })
+        },
+    )
+  }, [updatedUser, user.id]);
+
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         enabled
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ flex: 1 }}
         >
           <Container>
             <BackButton onPress={handleGoBack}>
               <Icon name="chevron-left" size={24} color="#999591" />
             </BackButton>
-            <UserAvatarButton onPress={() => {}}>
-              <UserAvatar source={{ uri: user.avatar_url }} />
+            <UserAvatarButton onPress={handleUpdateAvatar}>
+              <UserAvatar source={{uri: user.avatar_url}} />
             </UserAvatarButton>
             <View>
               <Title>Meu perfil</Title>
@@ -166,7 +199,7 @@ const Profile: React.FC = () => {
                 placeholder="Senha atual"
                 secureTextEntry
                 returnKeyType="next"
-                containerStyle={{ marginTop: 16 }}
+                containerStyle={{marginTop: 16}}
                 textContentType="newPassword"
                 onSubmitEditing={() => {
                   passwordInputRef.current?.focus();
@@ -198,7 +231,7 @@ const Profile: React.FC = () => {
               />
 
               <Button
-                style={{ marginBottom: 80 }}
+                style={{marginBottom: 80}}
                 onPress={() => formRef.current?.submitForm()}
               >
                 Confirmar mudanças
